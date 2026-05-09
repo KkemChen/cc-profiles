@@ -3,7 +3,7 @@
   "name": "cc-profiles",
   "description": "Multi-model profile management and orchestration for Claude Code",
   "owner": {
-    "name": "Sisyphus",
+    "name": "KkemChen",
     "url": "https://github.com/KkemChen"
   },
   "plugins": [

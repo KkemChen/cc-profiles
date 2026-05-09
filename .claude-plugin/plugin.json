@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Create and manage isolated Claude Code profiles for multi-model collaboration via --settings. Add profiles for DeepSeek, GLM, Kimi, Qwen, MiniMax, OpenRouter and more with one command, then generate orchestration prompts to offload tasks across models.",
   "author": {
-    "name": "Sisyphus",
+    "name": "KkemChen",
     "url": "https://github.com/KkemChen"
   },
   "homepage": "https://github.com/KkemChen/cc-profiles",
