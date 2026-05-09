@@ -1,11 +1,11 @@
 ---
-name: profile-activate
+name: profile-enable
 description: Enable one or more AI provider profiles as helpers for the current session
 argument-hint: "[profile-name ...]"
 allowed-tools: Bash, Read, Glob, AskUserQuestion
 ---
 
-# /profile-activate
+# /profile-enable
 
 Enable specific provider profiles so the current session's AI knows it can delegate tasks to them. This does NOT switch your main model — it makes additional models available as helpers.
 
@@ -13,7 +13,7 @@ Enable specific provider profiles so the current session's AI knows it can deleg
 
 ### Step 1: Determine target profiles
 
-If the user provided names as arguments (e.g. `/profile-activate deepseek kimi`), use those. If no argument, scan `~/.claude/profiles/` and present available profiles for the user to pick from.
+If the user provided names as arguments (e.g. `/profile-enable deepseek kimi`), use those. If no argument, scan `~/.claude/profiles/` and present available profiles for the user to pick from.
 
 ### Step 2: Validate each profile
 
@@ -24,7 +24,7 @@ For each profile name, read `~/.claude/profiles/<name>.json`. Verify:
 
 Skip and warn about any profile that fails validation.
 
-### Step 3: Build the activation prompt
+### Step 3: Build the enabling prompt
 
 For each valid profile, extract:
 - Profile name
@@ -59,7 +59,7 @@ Key flags:
 - `--output-format json` — structured output (response includes `session_id` for future resume)
 - `--resume <id>` — resume a previous session to retain context
 
-[IF MULTIPLE PROFILES ACTIVATED, ADD A COMPARISON TABLE:]
+[IF MULTIPLE PROFILES ENABLED, ADD A COMPARISON TABLE:]
 | Profile | Best for |
 |---------|----------|
 | <name1> (<model>) | <suggested use> |
@@ -90,7 +90,7 @@ When resuming, extract `session_id` from the previous delegation's JSON output a
 
 ### Step 4: Proactive collaboration offer
 
-After displaying the activation prompt, ask proactively based on context:
+After displaying the enabling prompt, ask proactively based on context:
 
 If the user has an active task in the conversation:
 > "I notice we're working on [task summary]. Want me to delegate [specific subtask] to **<name>** to speed things up?"
@@ -98,9 +98,9 @@ If the user has an active task in the conversation:
 If no active task:
 > "**<name>** is now available as a helper. Tell me what you'd like to delegate, or I'll suggest opportunities as we work."
 
-### Step 5: Track activated profiles
+### Step 5: Track enabled profiles
 
-Maintain a mental note of which profiles are activated in this session. When the user later asks to delegate, reference the already-activated profiles rather than re-reading them.
+Maintain a mental note of which profiles are enabled in this session. When the user later asks to delegate, reference the already-enabled profiles rather than re-reading them.
 
 ## Error Handling
 
@@ -114,16 +114,16 @@ Maintain a mental note of which profiles are activated in this session. When the
 ## Examples
 
 ```
-/profile-activate deepseek
+/profile-enable deepseek
 ```
 → Enables DeepSeek profile, AI now knows it can offload to deepseek-v4-pro.
 
 ```
-/profile-activate deepseek kimi
+/profile-enable deepseek kimi
 ```
 → Enables both, shows comparison table, suggests which profile suits which task type.
 
 ```
-/profile-activate
+/profile-enable
 ```
 → No argument: scans profiles dir, lets user pick interactively.

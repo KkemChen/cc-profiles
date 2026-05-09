@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "cc-profiles",
-      "description": "Create isolated Claude Code profiles for different AI providers (DeepSeek, GLM, Kimi, Qwen, MiniMax, OpenRouter, etc.) and generate orchestration prompts for multi-model collaboration. Includes slash commands /profile-add, /profile-list, and /profile-activate, plus an auto-triggered skill for profile management.",
+      "description": "Create isolated Claude Code profiles for different AI providers (DeepSeek, GLM, Kimi, Qwen, MiniMax, OpenRouter, etc.) and generate orchestration prompts for multi-model collaboration. Includes slash commands /profile-add, /profile-list, and /profile-enable, plus an auto-triggered skill for profile management.",
       "version": "1.0.0",
       "source": "./",
       "category": "productivity",

@@ -26,7 +26,7 @@
   "commands": [
     "./commands/profile-add.md",
     "./commands/profile-list.md",
-    "./commands/profile-activate.md"
+    "./commands/profile-enable.md"
   ],
   "skills": [
     "./skills/"

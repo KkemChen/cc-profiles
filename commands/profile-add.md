@@ -99,7 +99,7 @@ If a file with the same name already exists, ask the user whether to overwrite.
 
 Tell the user:
 - Profile saved at: `~/.claude/profiles/<name>.json`
-- To use: `/profile-activate <name>` or `claude --settings ~/.claude/profiles/<name>.json`
+- To use: `/profile-enable <name>` or `claude --settings ~/.claude/profiles/<name>.json`
 
 ### Step 10: Security reminder
 

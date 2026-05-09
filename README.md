@@ -45,10 +45,10 @@ claude plugin install cc-profiles@cc-profiles
 ```bash
 /profile-add deepseek          # Set up a profile (API key, base URL, model)
 /profile-list                  # See all profiles and their status
-/profile-activate deepseek     # Enable as a helper for this session
+/profile-enable deepseek     # Enable as a helper for this session
 ```
 
-Or just say it naturally: "add a deepseek profile", "activate kimi", "delegate to glm".
+Or just say it naturally: "add a deepseek profile", "enable kimi", "delegate to glm".
 
 ## Commands
 
@@ -56,7 +56,7 @@ Or just say it naturally: "add a deepseek profile", "activate kimi", "delegate t
 |---|---|
 | `/profile-add [provider]` | Create a provider profile — collects API key, base URL, model |
 | `/profile-list` | Show all profiles and their status |
-| `/profile-activate [name]` | Enable a profile as a helper for the current session |
+| `/profile-enable [name]` | Enable a profile as a helper for the current session |
 
 ## How it works
 

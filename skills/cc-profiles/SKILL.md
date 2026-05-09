@@ -2,7 +2,7 @@
 name: cc-profiles
 description: >
   Manage Claude Code profiles for multiple AI providers (DeepSeek, GLM, Kimi, Qwen, MiniMax, OpenRouter, etc.).
-  Trigger when the user wants to add, list, or activate provider profiles, mentions "多模型", "切换供应商",
+  Trigger when the user wants to add, list, or enable provider profiles, mentions "多模型", "切换供应商",
   "add a [provider] profile", "use [provider] as helper", "delegate to [model]", or pastes a settings JSON.
   Also trigger proactively when the user is working on a large task and you detect an opportunity
   to suggest parallel delegation to a different model.
@@ -18,7 +18,7 @@ Route the user's request to the matching slash command. Each command contains th
 |--------|---------|----------|
 | Create a profile | `/profile-add` | "add deepseek profile", "setup kimi", pastes JSON with API keys |
 | Show profiles | `/profile-list` | "what profiles do I have", "list providers", "show models" |
-| Enable helper | `/profile-activate` | "activate deepseek", "let kimi help", "delegate to glm" |
+| Enable helper | `/profile-enable` | "enable deepseek", "let kimi help", "delegate to glm" |
 
 If the intent is ambiguous, ask one clarifying question. If no slash command fits, explain the three available commands and let the user choose.
 

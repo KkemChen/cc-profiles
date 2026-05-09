@@ -38,7 +38,7 @@ Format as a table:
 
 Total: 2 profiles across 2 providers
 Profiles stored in: ~/.claude/profiles/
-Commands: /profile-add <name> | /profile-activate <name> | /profile-list
+Commands: /profile-add <name> | /profile-enable <name> | /profile-list
 ```
 
 ### Edge cases
