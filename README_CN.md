@@ -45,7 +45,7 @@ claude plugin install cc-profiles@cc-profiles
 ```bash
 /profile-add deepseek          # 创建配置（API key、base URL、模型）
 /profile-list                  # 查看所有配置及状态
-/profile-activate deepseek     # 激活为当前会话助手
+/profile-activate deepseek     # 启用为当前会话的助手
 ```
 
 也支持自然语言触发：说 "添加 deepseek 配置"、"激活 kimi"、"委派给 glm" 即可。
@@ -56,13 +56,13 @@ claude plugin install cc-profiles@cc-profiles
 |---|---|
 | `/profile-add [provider]` | 创建供应商配置 —— 收集 API key、base URL、模型名 |
 | `/profile-list` | 查看所有配置及状态 |
-| `/profile-activate [name]` | 激活配置，让 AI 能向其委派任务 |
+| `/profile-activate [name]` | 启用配置作为当前会话的助手 |
 
 ## 工作原理
 
 **添加配置**时，收集你的 API key、base URL 和模型名，克隆全局 Claude Code 配置，保存至 `~/.claude/profiles/<name>.json`。
 
-**激活配置**时，向当前会话注入委派指令，AI 可通过以下方式分发子任务：
+**启用配置**后，该模型作为助手可用，AI 可通过以下方式分发子任务：
 ```
 claude --settings ~/.claude/profiles/<name>.json -p "..."
 ```

@@ -45,7 +45,7 @@ claude plugin install cc-profiles@cc-profiles
 ```bash
 /profile-add deepseek          # Set up a profile (API key, base URL, model)
 /profile-list                  # See all profiles and their status
-/profile-activate deepseek     # Activate as a session helper
+/profile-activate deepseek     # Enable as a helper for this session
 ```
 
 Or just say it naturally: "add a deepseek profile", "activate kimi", "delegate to glm".
@@ -56,13 +56,13 @@ Or just say it naturally: "add a deepseek profile", "activate kimi", "delegate t
 |---|---|
 | `/profile-add [provider]` | Create a provider profile — collects API key, base URL, model |
 | `/profile-list` | Show all profiles and their status |
-| `/profile-activate [name]` | Activate a profile so the AI can delegate tasks to it |
+| `/profile-activate [name]` | Enable a profile as a helper for the current session |
 
 ## How it works
 
 **Adding a profile** collects your API key, base URL, and model name, clones your global Claude Code config, and saves it to `~/.claude/profiles/<name>.json`.
 
-**Activating a profile** injects delegation instructions into the session so the AI can offload subtasks via:
+**Enabling a profile** makes it available as a helper — the AI can then offload subtasks via:
 ```
 claude --settings ~/.claude/profiles/<name>.json -p "..."
 ```

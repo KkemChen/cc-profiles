@@ -1,13 +1,13 @@
 ---
 name: profile-activate
-description: Activate one or more AI provider profiles as helpers for the current session
+description: Enable one or more AI provider profiles as helpers for the current session
 argument-hint: "[profile-name ...]"
 allowed-tools: Bash, Read, Glob, AskUserQuestion
 ---
 
 # /profile-activate
 
-Activate specific provider profiles so the current session's AI knows it can delegate tasks to them. This does NOT switch your main model — it makes additional models available as helpers.
+Enable specific provider profiles so the current session's AI knows it can delegate tasks to them. This does NOT switch your main model — it makes additional models available as helpers.
 
 ## Procedure
 
@@ -36,7 +36,7 @@ For each valid profile, extract:
 Generate this awareness prompt and output it directly into the conversation:
 
 ```
-## Profile Activated: <name>
+## Profile Enabled: <name>
 
 **Provider**: <provider> | **Model**: <model>
 **Profile path**: `~/.claude/profiles/<name>.json` (Windows: `%USERPROFILE%\.claude\profiles\<name>.json`)
@@ -96,7 +96,7 @@ If the user has an active task in the conversation:
 > "I notice we're working on [task summary]. Want me to delegate [specific subtask] to **<name>** to speed things up?"
 
 If no active task:
-> "**<name>** is ready to help. Just tell me what you'd like to delegate, or I'll suggest opportunities as we work."
+> "**<name>** is now available as a helper. Tell me what you'd like to delegate, or I'll suggest opportunities as we work."
 
 ### Step 5: Track activated profiles
 
@@ -116,12 +116,12 @@ Maintain a mental note of which profiles are activated in this session. When the
 ```
 /profile-activate deepseek
 ```
-→ Activates DeepSeek profile, AI now knows it can offload to deepseek-v4-pro.
+→ Enables DeepSeek profile, AI now knows it can offload to deepseek-v4-pro.
 
 ```
 /profile-activate deepseek kimi
 ```
-→ Activates both, shows comparison table, suggests which profile suits which task type.
+→ Enables both, shows comparison table, suggests which profile suits which task type.
 
 ```
 /profile-activate

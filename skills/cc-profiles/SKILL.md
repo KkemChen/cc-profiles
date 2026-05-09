@@ -18,7 +18,7 @@ Route the user's request to the matching slash command. Each command contains th
 |--------|---------|----------|
 | Create a profile | `/profile-add` | "add deepseek profile", "setup kimi", pastes JSON with API keys |
 | Show profiles | `/profile-list` | "what profiles do I have", "list providers", "show models" |
-| Activate helper | `/profile-activate` | "activate deepseek", "let kimi help", "delegate to glm" |
+| Enable helper | `/profile-activate` | "activate deepseek", "let kimi help", "delegate to glm" |
 
 If the intent is ambiguous, ask one clarifying question. If no slash command fits, explain the three available commands and let the user choose.
 
