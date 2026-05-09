@@ -95,32 +95,13 @@ Create directory `~/.claude/profiles/` if needed, then write to `~/.claude/profi
 
 If a file with the same name already exists, ask the user whether to overwrite.
 
-### Step 9: Add shell integration
-
-**Ask the user for confirmation before modifying any shell profile file.** Show exactly what will be appended and to which file. If the user declines, skip this step and show the manual command instead.
-
-**Windows (PowerShell):**
-```powershell
-function claude-<name> { claude --settings "$env:USERPROFILE\.claude\profiles\<name>.json" @args }
-```
-Check if `$PROFILE` exists. If not, create the directory and file.
-Before appending, search `$PROFILE` for the profile's JSON path (e.g. `profiles\<name>.json`) — if a function already references this profile (even under a different name like `claude-ds`), skip and report the existing shortcut name.
-
-**macOS / Linux (bash/zsh):**
-```bash
-alias claude-<name>='claude --settings ~/.claude/profiles/<name>.json'
-```
-Check both `~/.bashrc` and `~/.zshrc`. Before appending, search for the profile's JSON path — if an alias already references it, skip and report the existing shortcut name.
-
-### Step 10: Confirm
+### Step 9: Confirm
 
 Tell the user:
 - Profile saved at: `~/.claude/profiles/<name>.json`
-- Shell shortcut: `claude-<name>`
-- To activate: restart terminal or run `source ~/.zshrc` / `. $PROFILE`
-- Test with: `claude-<name> --version`
+- To use: `/profile-activate <name>` or `claude --settings ~/.claude/profiles/<name>.json`
 
-### Step 11: Security reminder
+### Step 10: Security reminder
 
 After saving, remind the user:
 
@@ -138,7 +119,6 @@ After saving, remind the user:
 | `~/.claude/settings.json` missing | Warn, use minimal defaults |
 | JSON invalid after merge | Show the error, let user fix |
 | Cannot write to profiles dir | Show permissions error |
-| Shell profile not found | Create it |
 
 ## Provider Quick Reference
 

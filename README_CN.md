@@ -55,12 +55,12 @@ claude plugin install cc-profiles@cc-profiles
 | 命令 | 功能 |
 |---|---|
 | `/profile-add [provider]` | 创建供应商配置 —— 收集 API key、base URL、模型名 |
-| `/profile-list` | 查看所有配置、快捷命令及就绪状态 |
+| `/profile-list` | 查看所有配置及状态 |
 | `/profile-activate [name]` | 激活配置，让 AI 能向其委派任务 |
 
 ## 工作原理
 
-**添加配置**时，收集你的 API key、base URL 和模型名，克隆全局 Claude Code 配置，保存至 `~/.claude/profiles/<name>.json`，并自动创建 shell 快捷命令（`claude-ds`、`claude-glm` 等），可从终端直接调用。
+**添加配置**时，收集你的 API key、base URL 和模型名，克隆全局 Claude Code 配置，保存至 `~/.claude/profiles/<name>.json`。
 
 **激活配置**时，向当前会话注入委派指令，AI 可通过以下方式分发子任务：
 ```
@@ -68,7 +68,7 @@ claude --settings ~/.claude/profiles/<name>.json -p "..."
 ```
 支持 `--resume` 保持上下文连续性 —— AI 自主判断何时续接之前的对话。
 
-**列出配置**时，扫描 profiles 目录，按文件路径匹配检测 shell 快捷方式，报告各项就绪状态。
+**列出配置**时，扫描 profiles 目录，报告各 profile 的供应商、模型及就绪状态。
 
 ## 支持的供应商
 

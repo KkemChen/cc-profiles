@@ -55,12 +55,12 @@ Or just say it naturally: "add a deepseek profile", "activate kimi", "delegate t
 | Command | What it does |
 |---|---|
 | `/profile-add [provider]` | Create a provider profile — collects API key, base URL, model |
-| `/profile-list` | Show all profiles, shortcuts, and readiness |
+| `/profile-list` | Show all profiles and their status |
 | `/profile-activate [name]` | Activate a profile so the AI can delegate tasks to it |
 
 ## How it works
 
-**Adding a profile** collects your API key, base URL, and model name, clones your global Claude Code config, and saves it to `~/.claude/profiles/<name>.json`. It also creates a shell shortcut (`claude-ds`, `claude-glm`, etc.) so you can invoke the profile directly from the terminal.
+**Adding a profile** collects your API key, base URL, and model name, clones your global Claude Code config, and saves it to `~/.claude/profiles/<name>.json`.
 
 **Activating a profile** injects delegation instructions into the session so the AI can offload subtasks via:
 ```
@@ -68,7 +68,7 @@ claude --settings ~/.claude/profiles/<name>.json -p "..."
 ```
 It supports `--resume` for multi-step workflows — the AI decides when to continue a previous context.
 
-**Listing profiles** scans the profiles directory, matches shell shortcuts by file path, and reports what's ready.
+**Listing profiles** scans the profiles directory and reports provider, model, and readiness for each.
 
 ## Supported Providers
 
