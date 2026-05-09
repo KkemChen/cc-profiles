@@ -1,0 +1,20 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "cc-profiles",
+  "description": "Multi-model profile management and orchestration for Claude Code",
+  "owner": {
+    "name": "Sisyphus",
+    "url": "https://github.com/KkemChen"
+  },
+  "plugins": [
+    {
+      "name": "cc-profiles",
+      "description": "Create isolated Claude Code profiles for different AI providers (DeepSeek, GLM, Kimi, Qwen, MiniMax, OpenRouter, etc.) and generate orchestration prompts for multi-model collaboration. Includes slash commands /profile-add, /profile-list, and /profile-activate, plus an auto-triggered skill for profile management.",
+      "version": "1.0.0",
+      "source": "./",
+      "category": "productivity",
+      "tags": ["profiles", "multi-model", "orchestration", "provider", "claude-code", "settings"],
+      "strict": false
+    }
+  ]
+}
