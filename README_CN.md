@@ -28,9 +28,16 @@ cc-profiles 让你创建**隔离的配置文件**，让其他模型*通过* Clau
 
 ## 安装
 
+**终端命令行：**
 ```bash
 claude plugin marketplace add KkemChen/cc-profiles
 claude plugin install cc-profiles@cc-profiles
+```
+
+**Claude Code 内部：**
+```
+/plugin marketplace add KkemChen/cc-profiles
+/plugin install cc-profiles@cc-profiles
 ```
 
 ## 快速上手

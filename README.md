@@ -28,9 +28,16 @@ cc-profiles lets you spin up **isolated profiles** for other models that run *th
 
 ## Install
 
+**From terminal:**
 ```bash
 claude plugin marketplace add KkemChen/cc-profiles
 claude plugin install cc-profiles@cc-profiles
+```
+
+**From inside Claude Code:**
+```
+/plugin marketplace add KkemChen/cc-profiles
+/plugin install cc-profiles@cc-profiles
 ```
 
 ## Quick Start
