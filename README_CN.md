@@ -44,8 +44,9 @@ claude plugin install cc-profiles@cc-profiles
 
 ```bash
 /profile-add deepseek          # 创建配置（API key、base URL、模型）
+/profile-test deepseek         # 5 秒探针，验证配置真的能通
 /profile-list                  # 查看所有配置及状态
-/profile-enable deepseek     # 启用为当前会话的助手
+/profile-enable deepseek       # 启用为当前会话的助手
 ```
 
 也支持自然语言触发：说 "添加 deepseek 配置"、"激活 kimi"、"委派给 glm" 即可。
@@ -54,21 +55,25 @@ claude plugin install cc-profiles@cc-profiles
 
 | 命令 | 功能 |
 |---|---|
-| `/profile-add [provider]` | 创建供应商配置 —— 收集 API key、base URL、模型名 |
-| `/profile-list` | 查看所有配置及状态 |
-| `/profile-enable [name]` | 启用配置作为当前会话的助手 |
+| `/profile-add [provider]` | 创建供应商配置 —— 收集 API key、base URL、模型名。默认使用 **Slim** 模式（精简，适合委派）。如需把 profile 当主 harness 启动，选 **Mirror** 模式。 |
+| `/profile-test [name]` | 发送 1 轮探针验证 API key、base URL、模型名是否真能通。能在 5 秒内定位"卡住没响应"问题。 |
+| `/profile-list` | 列出所有配置，显示模式（Slim / Mirror）、供应商、模型 |
+| `/profile-enable [name]` | 启用配置作为当前会话的助手，提供三种委派模式（单次 / 流式 / 缓存续接） |
 
 ## 工作原理
 
-**添加配置**时，收集你的 API key、base URL 和模型名，克隆全局 Claude Code 配置，保存至 `~/.claude/profiles/<name>.json`。
+**添加配置**时，收集你的 API key、base URL 和模型名，保存一份精简的 "Slim" settings JSON 到 `~/.claude/profiles/<name>.json`。Slim profile 自带空的 `enabledPlugins` / `mcpServers`，这让每次委派的冷启动成本比克隆全局配置低 ~33%。如果你确实需要插件全套都对委派模型可见，创建时选 **Mirror** 模式。
 
-**启用配置**后，该模型作为助手可用，AI 可通过以下方式分发子任务：
-```
-claude --settings ~/.claude/profiles/<name>.json -p "..."
-```
-支持 `--resume` 保持上下文连续性 —— AI 自主判断何时续接之前的对话。
+**测试配置**会跑 `claude --settings ... -p "ok" --max-turns 1`，回报延迟、token 用量、费用，以及任何认证/网络错误。新建配置后请务必先测一下再用。
 
-**列出配置**时，扫描 profiles 目录，报告各 profile 的供应商、模型及就绪状态。
+**启用配置**让该 profile 成为可用的助手 —— AI 会根据任务形态自动选择三种委派模式之一：
+- 模式 A —— 短任务用 `--output-format json`
+- 模式 B —— 长任务用 `--output-format stream-json --verbose` 重定向到日志，配合 Monitor 工具实时看进度
+- 模式 C —— 多步骤任务用 `--resume <session_id>` 复用 prompt cache（后续调用成本降低约 80%）
+
+每次委派结束后，AI 会向你回报 `total_cost_usd`，让成本透明。
+
+**列出配置**时扫描 profiles 目录，报告各 profile 的供应商、模型、模式（Slim/Mirror）及就绪状态。自定义聚合器（OneAPI/NewAPI/LiteLLM）会按其 host 名称标注，而不是显示 "Unknown"。
 
 ## 支持的供应商
 

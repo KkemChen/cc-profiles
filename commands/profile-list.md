@@ -12,17 +12,19 @@ Display all configured Claude Code profiles and their details.
 
 ### Step 1: Discover profiles
 
-Scan `~/.claude/profiles/` for all `*.json` files. On Windows, `~` = `%USERPROFILE%`.
+Scan `~/.claude/profiles/` for all `*.json` files. On Windows, `~` = `%USERPROFILE%`. Skip `.gitignore` and any other non-JSON files.
 
 ### Step 2: Read each profile
 
 For each profile JSON, extract:
-- Profile name: filename minus `.json`
-- Model: `env.ANTHROPIC_MODEL`
-- Base URL: `env.ANTHROPIC_BASE_URL`
-- Provider: infer from URL (e.g. `api.deepseek.com` → DeepSeek, `api.anthropic.com` → Claude, `api.z.ai` → GLM, etc.)
-- Fast model: `env.ANTHROPIC_DEFAULT_HAIKU_MODEL` (if different from main)
-- Strong model: `env.ANTHROPIC_DEFAULT_OPUS_MODEL` (if different from main)
+- **Name**: filename minus `.json`
+- **Model**: `env.ANTHROPIC_MODEL` (fallback: `env.ANTHROPIC_DEFAULT_SONNET_MODEL`)
+- **Base URL**: `env.ANTHROPIC_BASE_URL`
+- **Provider**: match URL against `references/provider-urls.md`. **If no match, use the URL's host portion** (e.g. `oneapi.example.com` from `https://oneapi.example.com/v1/anthropic`). Do not label as "Unknown" — custom aggregators (OneAPI/NewAPI/LiteLLM) are common.
+- **Fast model**: `env.ANTHROPIC_DEFAULT_HAIKU_MODEL` (only show if different from main)
+- **Strong model**: `env.ANTHROPIC_DEFAULT_OPUS_MODEL` (only show if different from main)
+- **Mode**: if `enabledPlugins` is `{}` (empty object) and `mcpServers` is `{}`, label **Slim**. Otherwise **Mirror**. Slim profiles cost ~$0.10 less per cold start.
+- **Health**: derived only from file presence + JSON validity. Call `/profile-test <name>` for an actual API probe — `profile-list` does not spend money on network checks.
 
 ### Step 3: Display
 
@@ -31,17 +33,22 @@ Format as a table:
 ```
 ## Configured Profiles
 
-| Name | Provider | Model | Fast | Strong |
-|------|----------|-------|------|--------|
-| deepseek | DeepSeek | deepseek-v4-pro | deepseek-v4-flash | — |
-| glm | GLM | glm-4 | glm-4-flash | — |
+| Name | Provider | Model | Mode | Fast | Strong |
+|------|----------|-------|------|------|--------|
+| deepseek | DeepSeek | deepseek-v4-pro | Slim | deepseek-v4-flash | — |
+| glm | GLM | glm-4.6 | Slim | glm-4-flash | — |
+| onepay | oneapi.example.com | claude-sonnet-4-5 | Mirror | — | — |
 
-Total: 2 profiles across 2 providers
+Total: 3 profiles
 Profiles stored in: ~/.claude/profiles/
-Commands: /profile-add <name> | /profile-enable <name> | /profile-list
+Commands: /profile-add | /profile-test | /profile-enable | /profile-list
 ```
+
+After the table, if any profile is **Mirror** mode, add a one-line note:
+> Mirror profiles inherit your global plugins/MCP. They cost ~$0.10 more per cold start than Slim. Recreate with `/profile-add <name>` to switch to Slim if you only use them for delegation.
 
 ### Edge cases
 
 - **No profiles found**: "No profiles yet. Run `/profile-add <provider>` to create one."
-- **Profile file can't be read**: Show name with error reason.
+- **Profile file can't be read**: Show the name with the specific error (permission denied, corrupted JSON, etc.) rather than hiding it — the user needs to know it exists but is broken.
+- **Profile missing `env` block**: Show with mode `(invalid)` and a hint to recreate.

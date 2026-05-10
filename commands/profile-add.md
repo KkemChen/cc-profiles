@@ -9,9 +9,17 @@ allowed-tools: Bash, Read, Write, Edit, AskUserQuestion
 
 Create an isolated Claude Code settings profile for switching between AI providers via `--settings`.
 
-## Procedure
+## Step 0: Detect a pasted JSON config (Full mode shortcut)
 
-### Step 1: Collect profile name
+**Before asking anything else**, scan the user's invocation arguments and any prior message in this turn for a JSON object containing `env.ANTHROPIC_BASE_URL` (or `"ANTHROPIC_BASE_URL"` as a key). If found:
+
+1. Treat this as **Full mode** — the user is providing a complete settings JSON.
+2. Skip Steps 1–5; ask only for the **profile name** (one short question), then jump to Step 7 (Validate) and Step 8 (Save) using the pasted JSON verbatim.
+3. Do **not** merge or modify the pasted JSON — the user gave you what they want.
+
+This auto-detection prevents a common mistake: users paste a JSON in answer to "what should this profile be called?" and the workflow misroutes it as a name.
+
+## Step 1: Collect profile name
 
 If the user provided a name as argument (e.g. `/profile-add deepseek`), use it. Otherwise ask:
 
@@ -19,24 +27,25 @@ If the user provided a name as argument (e.g. `/profile-add deepseek`), use it. 
 
 Normalize the name: lowercase, alphanumeric + hyphens only.
 
-### Step 2: Check for known provider
+## Step 2: Check for known provider
 
 If the name matches a known provider, pre-fill the base URL. The full list is in `references/provider-urls.md` — read it and match. If no match, treat as custom.
 
-### Step 3: Collect required information
+## Step 3: Collect required information
 
 Ask these questions together (use `AskUserQuestion` with multiple fields):
 
 1. **API Key** — the auth token for this provider
 2. **Base URL** — pre-filled if known provider, otherwise ask
 3. **Main model** — the model to use for most tasks (maps to `ANTHROPIC_MODEL` and `ANTHROPIC_DEFAULT_SONNET_MODEL`)
-4. **Mode preference**:
-   - **Quick** (recommended) — just the 3 fields above, everything else cloned from your current global config
-   - **Full** — you'll paste a complete JSON config
+4. **Mode preference** — pick one:
+   - **Slim** ⭐ (recommended, default) — minimal profile: env + permissions only. Best for delegation: ~33% smaller system prompt → ~$0.10 cheaper per cold start, faster startup, no plugin side-effects.
+   - **Mirror** — clone your global plugins, MCP servers, statusLine, marketplace config. Use this if you intend to launch this profile as your primary harness (`claude --settings ...`), not just for delegation.
+   - **Full** — paste a complete JSON config. (Auto-selected in Step 0 if a JSON was already pasted.)
 
-If Full mode, the user will paste a complete JSON — jump to Step 7 (Validate).
+If Full mode, jump to Step 7 (Validate).
 
-### Step 4: Collect optional model overrides (Quick mode only)
+## Step 4: Collect optional model overrides (Slim and Mirror modes)
 
 Ask optionally (user can skip):
 
@@ -44,27 +53,11 @@ Ask optionally (user can skip):
 6. **Opus-equivalent model** — strongest model (defaults to main model)
 7. **Small/fast model** — for quick tasks (defaults to Haiku-equivalent)
 
-### Step 5: Clone global config (Quick mode only)
+## Step 5: Build the profile JSON
 
-Read `~/.claude/settings.json`. On Windows, `~` = `%USERPROFILE%`.
+### Step 5a — Slim mode (default)
 
-Extract these fields from the global config (do NOT copy `env`):
-- `permissions`, `enabledPlugins`, `theme`, `statusLine`
-- `extraKnownMarketplaces`, `hasCompletedOnboarding`
-- `skipDangerousModePermissionPrompt`, `agentPushNotifEnabled`
-- `model`
-
-If `~/.claude/settings.json` does not exist, warn the user and proceed with minimal defaults:
-```json
-{
-  "permissions": { "defaultMode": "acceptEdits" },
-  "hasCompletedOnboarding": true
-}
-```
-
-### Step 6: Build the profile JSON
-
-Merge into this structure:
+Build this minimal structure. **Do not** read or merge `~/.claude/settings.json`:
 
 ```json
 {
@@ -77,36 +70,77 @@ Merge into this structure:
     "ANTHROPIC_DEFAULT_OPUS_MODEL": "<opus_or_main>",
     "ANTHROPIC_SMALL_FAST_MODEL": "<fast_or_haiku>"
   },
-  "...all cloned fields..."
+  "permissions": {
+    "defaultMode": "bypassPermissions"
+  },
+  "hasCompletedOnboarding": true,
+  "skipDangerousModePermissionPrompt": true,
+  "enabledPlugins": {},
+  "mcpServers": {}
 }
 ```
 
-The critical env var is `ANTHROPIC_DEFAULT_SONNET_MODEL` — Claude Code defaults to Sonnet for most tasks, so setting this "tricks" it into routing those requests to your chosen model.
+**Why empty `enabledPlugins` / `mcpServers`** — these are explicit empty objects (not omitted) so the delegated session does not inherit them from the parent harness's defaults. This is the single biggest cost saver: plugins and MCP server schemas can add 20K+ tokens to every cold start.
 
-### Step 7: Validate
+### Step 5b — Mirror mode
 
-- Check JSON is valid (`JSON.parse` equivalent)
-- Check `env` object exists and has at minimum `ANTHROPIC_BASE_URL` and `ANTHROPIC_AUTH_TOKEN`
+Read `~/.claude/settings.json` (Windows: `%USERPROFILE%\.claude\settings.json`). Extract:
+- `permissions`, `enabledPlugins`, `theme`, `statusLine`
+- `mcpServers`, `extraKnownMarketplaces`, `hasCompletedOnboarding`
+- `skipDangerousModePermissionPrompt`, `agentPushNotifEnabled`, `model`
+
+Merge with the env block from Step 5a. Result:
+
+```json
+{
+  "env": { "...same as Slim..." },
+  "...all cloned fields from global settings..."
+}
+```
+
+If `~/.claude/settings.json` does not exist, fall back to Slim mode and warn the user.
+
+### Critical env var note
+
+`ANTHROPIC_DEFAULT_SONNET_MODEL` is the most important field. Claude Code defaults to Sonnet for most tasks, so setting this routes those requests to your chosen model. Always set it equal to your main model.
+
+## Step 6: (reserved — formerly Step 6 logic moved into Step 5)
+
+## Step 7: Validate
+
+- Check JSON is valid (parses without error)
+- Check `env` object exists with at minimum `ANTHROPIC_BASE_URL` and `ANTHROPIC_AUTH_TOKEN`
 - Warn if any model field is empty (but don't block)
+- For Slim mode: confirm `enabledPlugins` and `mcpServers` are present as `{}` (not missing) — this is the cost-saving feature
 
-### Step 8: Save
+## Step 8: Save
 
-Create directory `~/.claude/profiles/` if needed, then write to `~/.claude/profiles/<name>.json`.
+1. Create directory `~/.claude/profiles/` if it doesn't exist (Windows: `%USERPROFILE%\.claude\profiles\`).
+2. **Auto-create `.gitignore` inside the profiles directory** if missing:
+   ```bash
+   # Write to ~/.claude/profiles/.gitignore
+   *
+   !.gitignore
+   ```
+   This protects against accidental commits if the parent `~/.claude/` is ever git-tracked. Do this every time even if just one profile already exists — the file is idempotent.
+3. Write the profile JSON to `~/.claude/profiles/<name>.json`.
+4. If a file with the same name already exists, ask the user whether to overwrite.
 
-If a file with the same name already exists, ask the user whether to overwrite.
-
-### Step 9: Confirm
+## Step 9: Confirm
 
 Tell the user:
 - Profile saved at: `~/.claude/profiles/<name>.json`
-- To use: `/profile-enable <name>` or `claude --settings ~/.claude/profiles/<name>.json`
+- Mode used: **Slim** / **Mirror** / **Full**
+- **Suggest a smoke test**: `/profile-test <name>` — verifies the API key, base URL, and model name actually work before they spend real money on a long task.
+- To enable as a delegation helper: `/profile-enable <name>`
+- To use as primary harness: `claude --settings ~/.claude/profiles/<name>.json`
 
-### Step 10: Security reminder
+## Step 10: Security reminder
 
 After saving, remind the user:
 
-> **Security**: Profile files contain API keys in plain text. Do not commit `~/.claude/profiles/` to version control. Consider adding it to your global `.gitignore`:
-> ```
+> **Security**: Profile files contain API keys in plain text. The plugin auto-creates a `.gitignore` inside `~/.claude/profiles/` to block accidental commits *within* that directory, but if you ever commit your entire `~/.claude/` directory or copy profiles elsewhere, that protection won't follow. For belt-and-suspenders safety, also add to your global gitignore:
+> ```bash
 > git config --global core.excludesFile ~/.gitignore_global
 > echo '.claude/profiles/' >> ~/.gitignore_global
 > ```
@@ -116,9 +150,10 @@ After saving, remind the user:
 | Situation | Action |
 |---|---|
 | Profile name already exists | Ask to overwrite |
-| `~/.claude/settings.json` missing | Warn, use minimal defaults |
+| `~/.claude/settings.json` missing (Mirror mode) | Fall back to Slim mode, warn |
 | JSON invalid after merge | Show the error, let user fix |
 | Cannot write to profiles dir | Show permissions error |
+| User pasted JSON without `env.ANTHROPIC_BASE_URL` | Treat as malformed Full input — ask user to provide a valid settings JSON |
 
 ## Provider Quick Reference
 
